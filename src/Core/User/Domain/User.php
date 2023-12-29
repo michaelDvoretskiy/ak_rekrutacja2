@@ -28,12 +28,13 @@ class User
     /**
      * @ORM\Column(type="boolean", nullable=true, options={"default": false})
      */
-    private string $active;
+    private bool $active = false;
 
     public function __construct(string $email)
     {
         $this->id = null;
         $this->email = $email;
+        $this->active = false;
     }
 
     public function getEmail(): string
