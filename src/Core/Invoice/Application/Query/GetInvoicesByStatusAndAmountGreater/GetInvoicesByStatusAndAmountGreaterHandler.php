@@ -17,9 +17,10 @@ class GetInvoicesByStatusAndAmountGreaterHandler
 
     public function __invoke(GetInvoicesByStatusAndAmountGreaterQuery $query): array
     {
+        $status = InvoiceStatus::tryFrom($query->status) ?? InvoiceStatus::NEW;
         $invoices = $this->invoiceRepository->getInvoicesWithGreaterAmountAndStatus(
             $query->amount,
-            InvoiceStatus::CANCELED
+            $status
         );
 
         return array_map(function (Invoice $invoice) {
