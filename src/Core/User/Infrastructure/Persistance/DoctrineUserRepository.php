@@ -2,7 +2,7 @@
 
 namespace App\Core\User\Infrastructure\Persistance;
 
-use App\Core\Invoice\Domain\Invoice;
+use App\Core\User\Domain\Exception\UserNotActiveException;
 use App\Core\User\Domain\Exception\UserNotFoundException;
 use App\Core\User\Domain\Repository\UserRepositoryInterface;
 use App\Core\User\Domain\User;
@@ -35,6 +35,19 @@ class DoctrineUserRepository implements UserRepositoryInterface
 
         if (null === $user) {
             throw new UserNotFoundException('Użytkownik nie istnieje');
+        }
+
+        return $user;
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function getActiveByEmail(string $email): User {
+        $user = $this->getByEmail($email);
+
+        if (!$user->isActive()) {
+            throw new UserNotActiveException('Użytkownik jest nieaktywny');
         }
 
         return $user;

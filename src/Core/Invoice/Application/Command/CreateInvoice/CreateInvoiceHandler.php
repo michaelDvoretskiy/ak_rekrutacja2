@@ -18,7 +18,7 @@ class CreateInvoiceHandler
     public function __invoke(CreateInvoiceCommand $command): void
     {
         $this->invoiceRepository->save(new Invoice(
-            $this->userRepository->getByEmail($command->email),
+            $this->userRepository->getActiveByEmail($command->email),
             $command->amount
         ));
 
