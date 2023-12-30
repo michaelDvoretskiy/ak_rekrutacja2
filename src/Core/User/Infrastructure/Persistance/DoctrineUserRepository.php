@@ -2,6 +2,8 @@
 
 namespace App\Core\User\Infrastructure\Persistance;
 
+use App\Core\Invoice\Domain\Invoice;
+use App\Core\Invoice\Domain\Status\InvoiceStatus;
 use App\Core\User\Domain\Exception\UserNotActiveException;
 use App\Core\User\Domain\Exception\UserNotFoundException;
 use App\Core\User\Domain\Repository\UserRepositoryInterface;
@@ -51,6 +53,17 @@ class DoctrineUserRepository implements UserRepositoryInterface
         }
 
         return $user;
+    }
+
+    public function getInactiveUsers(): array
+    {
+        return $this->entityManager
+            ->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->where('u.active = false')
+            ->getQuery()
+            ->getResult();
     }
 
     public function save(User $user): void
