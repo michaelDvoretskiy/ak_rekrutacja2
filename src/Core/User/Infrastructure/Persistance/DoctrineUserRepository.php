@@ -2,8 +2,6 @@
 
 namespace App\Core\User\Infrastructure\Persistance;
 
-use App\Core\Invoice\Domain\Invoice;
-use App\Core\Invoice\Domain\Status\InvoiceStatus;
 use App\Core\User\Domain\Exception\UserNotActiveException;
 use App\Core\User\Domain\Exception\UserNotFoundException;
 use App\Core\User\Domain\Repository\UserRepositoryInterface;
