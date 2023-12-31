@@ -3,6 +3,7 @@
 namespace App\Core\User\Domain;
 
 use App\Common\EventManager\EventsCollectorTrait;
+use App\Core\User\Domain\Event\UserCreatedEvent;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,14 +26,27 @@ class User
      */
     private string $email;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default": false})
+     */
+    private bool $active = false;
+
     public function __construct(string $email)
     {
         $this->id = null;
         $this->email = $email;
+        $this->active = false;
+
+        $this->record(new UserCreatedEvent($this));
     }
 
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active ?? true;
     }
 }
