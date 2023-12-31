@@ -19,4 +19,6 @@ interface UserRepositoryInterface
     public function save(User $user): void;
 
     public function flush(): void;
+
+    public function checkIfUserExists(string $email): void;
 }

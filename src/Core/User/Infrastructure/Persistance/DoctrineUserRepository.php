@@ -2,6 +2,7 @@
 
 namespace App\Core\User\Infrastructure\Persistance;
 
+use App\Core\User\Domain\Exception\UserEmailDuplicationException;
 use App\Core\User\Domain\Exception\UserNotActiveException;
 use App\Core\User\Domain\Exception\UserNotFoundException;
 use App\Core\User\Domain\Repository\UserRepositoryInterface;
@@ -20,18 +21,11 @@ class DoctrineUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @throws NonUniqueResultException
+     * @throws UserNotFoundException
      */
     public function getByEmail(string $email): User
     {
-        $user = $this->entityManager->createQueryBuilder()
-            ->select('u')
-            ->from(User::class, 'u')
-            ->where('u.email = :user_email')
-            ->setParameter(':user_email', $email)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+        $user = $this->searchByEmail($email);
 
         if (null === $user) {
             throw new UserNotFoundException('Użytkownik nie istnieje');
@@ -41,7 +35,19 @@ class DoctrineUserRepository implements UserRepositoryInterface
     }
 
     /**
-     * @throws NonUniqueResultException
+     * @throws UserEmailDuplicationException
+     */
+    public function checkIfUserExists(string $email): void
+    {
+        $user = $this->searchByEmail($email);
+
+        if (null !== $user) {
+            throw new UserEmailDuplicationException('Użytkownik z mailem '.$email.' już istnieje');
+        }
+    }
+
+    /**
+     * @throws UserNotActiveException
      */
     public function getActiveByEmail(string $email): User {
         $user = $this->getByEmail($email);
@@ -77,5 +83,17 @@ class DoctrineUserRepository implements UserRepositoryInterface
     public function flush(): void
     {
         $this->entityManager->flush();
+    }
+
+    private function searchByEmail(string $email): User|Null
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->where('u.email = :user_email')
+            ->setParameter(':user_email', $email)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

@@ -15,6 +15,8 @@ class CreateUserHandler
 
     public function __invoke(CreateUserCommand $command): void
     {
+        $this->userRepository->checkIfUserExists($command->email);
+
         $this->userRepository->save(new User($command->email));
 
         $this->userRepository->flush();
